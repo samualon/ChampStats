@@ -47,7 +47,7 @@ def upToDateCheck():
 
     if response.status_code != 200:
         print(response.status_code)
-        print("Server unresponsive!")
+        print("Server unresponsive! Try again later...")
         quit()
     
 
@@ -66,6 +66,12 @@ def upToDateCheck():
 
 def getSessionPosition(driver_number, session_key):
     response = requests.get('https://api.openf1.org/v1/position?driver_number=' + str(driver_number) + '&session_key=' + str(session_key))
+
+    if response.status_code != 200:
+        print(response.status_code)
+        print("Server unresponsive! Try again later...")
+        quit()
+
     print('https://api.openf1.org/v1/position?driver_number=' + str(driver_number) + '&session_key=' + str(session_key))
     positions = response.json()
 
@@ -93,8 +99,8 @@ def fetchData(upToDate):
     for driver in driver_list:
         df.loc[df['Number'] == driver, upToDate] = getSessionPosition(driver, session_key)
     
-    print(df)
+    return df
 
 
 
-fetchData(upToDateCheck())
+save_to_sheet('formule1 2025.ods', fetchData(upToDateCheck()), 'Race positions')
