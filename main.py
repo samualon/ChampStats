@@ -66,11 +66,13 @@ def upToDateCheck():
 
 def getSessionPosition(driver_number, session_key):
     response = requests.get('https://api.openf1.org/v1/position?driver_number=' + str(driver_number) + '&session_key=' + str(session_key))
+    print('https://api.openf1.org/v1/position?driver_number=' + str(driver_number) + '&session_key=' + str(session_key))
     positions = response.json()
 
-    position = position[-1]['position']
+    if len(positions) > 0:
+        position = positions[-1]['position']
+        return position
 
-    return position
 
 
 def fetchData(upToDate):
