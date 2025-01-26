@@ -1,10 +1,12 @@
 import requests
 import pandas as pd
+import time
 
 
 def write_sheet(df, sheet, path):
-    with pd.ExcelWriter(path, engine="openpyxl", mode="a", if_sheet_exists="overlay") as writer:
-        df.to_excel(writer, sheet_name=sheet, index=False)
+    if df is not False:
+        with pd.ExcelWriter(path, engine="openpyxl", mode="a", if_sheet_exists="overlay") as writer:
+            df.to_excel(writer, sheet_name=sheet, index=False)
 
 
 def upToDateCheck():
