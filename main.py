@@ -20,12 +20,15 @@ def upToDateCheck():
     latest_key = data[0]['meeting_key']
     circ = data[0]['circuit_short_name']
 
-    df = pd.read_excel('formule1 2025.ods', engine='odf', sheet_name='Races')
+    df = pd.read_excel('formula1.xlsx', sheet_name='Races')
     sheet_key = df.loc[0, 'Last fetch']
 
     if latest_key == sheet_key:
         return 1
     else:
+        df.loc[0, 'Last fetch'] = latest_key
+        write_sheet(df, 'Races', 'formula1.xlsx')
+
         return [latest_key, circ]
 
 
@@ -45,7 +48,6 @@ def getSessionPosition(driver_number, session_key):
         return position
 
 
-
 def fetchData(upToDate):
     if upToDate == 1:
         print("Already up to date!")
@@ -58,14 +60,13 @@ def fetchData(upToDate):
     data = response.json()
     session_key = data[0]['session_key']
     
-    df = pd.read_excel('formule1 2025.ods', engine='odf', sheet_name='Race positions')
+    df = pd.read_excel('formula1.xlsx', sheet_name='Race positions')
     driver_list = df['Number']
 
     for driver in driver_list:
-        df.loc[df['Number'] == driver, upToDate] = getSessionPosition(driver, session_key)
+        df.loc[df['Number'] == driver, circ] = getSessionPosition(driver, session_key)
     
     return df
 
 
-
-save_to_sheet('formule1 2025.ods', fetchData(upToDateCheck()), 'Race positions')
+write_sheet(fetchData(upToDateCheck()), 'Race positions', 'formula1.xlsx')
