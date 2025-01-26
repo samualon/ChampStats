@@ -50,7 +50,7 @@ def getSessionPosition(driver_number, session_key):
         return position
 
 
-def fetchData(upToDate):
+def fetchData(upToDate, session_name):
     if upToDate == 1:
         print("Already up to date!")
         quit()
@@ -58,10 +58,14 @@ def fetchData(upToDate):
     meeting = upToDate[0]
     circ = upToDate[1]
 
-    response = requests.get('https://api.openf1.org/v1/sessions?meeting_key=' + str(meeting) + '&session_name=Race')
+    response = requests.get('https://api.openf1.org/v1/sessions?meeting_key=' + str(meeting) + '&session_name=' + str(session_name))
     data = response.json()
-    session_key = data[0]['session_key']
+    if len(data) > 0:
+        session_key = data[0]['session_key']
+    else:
+        return False
     
+    sheet_name = str(session_name) + ' positions'
     df = pd.read_excel('formula1.xlsx', sheet_name='Race positions')
     driver_list = df['Number']
 
@@ -71,4 +75,9 @@ def fetchData(upToDate):
     return df
 
 
-write_sheet(fetchData(upToDateCheck()), 'Race positions', 'formula1.xlsx')
+session_data = upToDateCheck()
+write_sheet(fetchData(session_data, 'Sprint'), 'Sprint positions', 'formula1.xlsx')
+time.sleep(5)
+write_sheet(fetchData(session_data, 'Qualifying'), 'Qualifying positions', 'formula1.xlsx')
+time.sleep(5)
+write_sheet(fetchData(session_data, 'Race'), 'Race positions', 'formula1.xlsx')
