@@ -1,45 +1,10 @@
 import requests
 import pandas as pd
-from odf.opendocument import load
-from odf.table import Table, TableRow, TableCell
-from odf.text import P
 
 
-def save_to_sheet(file_path, df, sheet_name):
-    # Load the existing ODS file
-    doc = load(file_path)
-    spreadsheet = doc.spreadsheet
-
-    # Remove the sheet if it already exists
-    for table in spreadsheet.getElementsByType(Table):
-        if table.getAttribute("name") == sheet_name:
-            spreadsheet.removeChild(table)
-
-    # Create a new sheet
-    new_table = Table(name=sheet_name)
-
-    # Write column headers
-    header_row = TableRow()
-    for col in df.columns:
-        cell = TableCell()
-        cell.addElement(P(text=str(col)))
-        header_row.addElement(cell)
-    new_table.addElement(header_row)
-
-    # Write data rows
-    for _, row in df.iterrows():
-        data_row = TableRow()
-        for cell_value in row:
-            cell = TableCell()
-            cell.addElement(P(text=str(cell_value)))
-            data_row.addElement(cell)
-        new_table.addElement(data_row)
-
-    # Append the new sheet to the spreadsheet
-    spreadsheet.addElement(new_table)
-
-    # Save the updated ODS file
-    doc.save(file_path)
+def write_sheet(df, sheet, path):
+    with pd.ExcelWriter(path, engine="openpyxl", mode="a", if_sheet_exists="overlay") as writer:
+        df.to_excel(writer, sheet_name=sheet, index=False)
 
 
 def upToDateCheck():
